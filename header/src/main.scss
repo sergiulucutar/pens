@@ -12,6 +12,7 @@ body {
   margin: 0;
 
   font-family: "Roboto", sans-serif;
+  overflow-x: hidden;
 }
 
 header {
@@ -29,6 +30,8 @@ header {
   padding: 0 100px;
 
   border-bottom: 3px solid black;
+
+  transition: all 5s linear;
 
   .logo {
     position: relative;
@@ -61,6 +64,14 @@ header {
       font-size: 2rem;
     }
   }
+
+  &.angry {
+    background-color: red;
+    border: 10px solid black;
+    height: 200px;
+
+    transition: all 10s linear;
+  }
 }
 
 .page {
@@ -76,7 +87,10 @@ header {
 
   transform: translate3d(0, 100%, 0);
 
-  background-color: yellow;
+  background-color: white;
+  border: 3px solid yellow;
+
+  visibility: hidden;
   white-space: nowrap;
 
   &_buttons {
@@ -85,5 +99,28 @@ header {
     &.show {
       display: block;
     }
+  }
+
+  &.show {
+    visibility: visible;
+  }
+}
+
+.page {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(50vmin, 1fr));
+  grid-row-gap: 10Vmin;
+  justify-items: center;
+
+  margin:  40px 0;
+}
+
+.page-main {
+
+  > div {
+    width: 20vw;
+    height: 40vh;
+
+    background-color: gray;
   }
 }
