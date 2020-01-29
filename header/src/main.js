@@ -46,7 +46,7 @@ function deliverLine(node) {
 }
 
 function cb_handleElasticHeader() {
-  headerEl.style = `height: ${window.scrollY}px; transform: translateY(${window.scrollY}px)`;
+  headerEl.style = `height: ${window.scrollY}px; transform: translateY(${window.scrollY}px); background-color: hsl(${random(0, 360)}, 70%, 40%)`;
 
   if (headerEl.offsetHeight > window.innerHeight * 0.7) {
     deliverLine(text.invisible);
@@ -59,6 +59,16 @@ function cb_handleElasticHeader() {
 function handleElasticHeader() {
   headerEl.classList.add("elastic");
   document.addEventListener("scroll", cb_handleElasticHeader);
+}
+
+function triggerHeaderStuck() {
+  headerEl.classList.remove('invisible');
+  headerEl.classList.add('stuck');
+  headerEl.onclick = () => {
+    deliverLine(text.stuck);
+    headerEl.onclick = undefined;
+    // setTimeout(() => delete, 0);
+  }
 }
 
 // TEXT
@@ -79,12 +89,14 @@ var text = {
       "Ooh ooh, ok, I've been sitting here all day helping people get around, and this is the awenser that I get.",
     cb: () => {
       deliverLine(text.anger);
+      headerEl.classList.add('shake');
     }
   },
   anger: {
     t: "HOW DARE YOU!!!",
     cb: () => {
       deliverLine(text.cool);
+      headerEl.classList.remove('shake');
       headerEl.classList.remove("angry");
     }
   },
@@ -134,8 +146,11 @@ var text = {
                               headerEl.style = "";
                               headerEl.classList.add("invisible");
                               deliverLine({
-                                t: "Goob bye."
+                                t: "Good bye."
                               });
+                              setTimeout(() => {
+                                triggerHeaderStuck();
+                              }, 5000);
                             }
                           })
                       })
@@ -143,7 +158,23 @@ var text = {
               })
           })
       })
+  },
+  stuck: {
+    t: 'I\'m stuck.',
+    cb: () => deliverLine({
+      t: 'God, this is embarrassing...',
+      cb: () => deliverLine({
+        t: 'Will you press the EMERGENCY button?',
+        cb: () => deliverLine({
+          t: 'Please?'
+        })
+      })
+    })
   }
 };
 
 deliverLine(text.intro);
+
+function random(min = 0, max) {
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
