@@ -28,9 +28,9 @@ header {
   height: 90px;
 
   padding: 0 100px;
-
   border-bottom: 3px solid black;
 
+  background-color: white;
   transition: all 5s linear;
 
   .logo {
@@ -70,7 +70,15 @@ header {
     border: 10px solid black;
     height: 200px;
 
-    transition: all 10s linear;
+    transition: all 6s linear;
+  }
+
+  &.elastic {
+    transition: height 0.1s linear;
+  }
+
+  &.invisible {
+    opacity: 0;
   }
 }
 
@@ -109,14 +117,13 @@ header {
 .page {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(50vmin, 1fr));
-  grid-row-gap: 10Vmin;
+  grid-row-gap: 10vmin;
   justify-items: center;
 
-  margin:  40px 0;
+  margin: 40px 0;
 }
 
 .page-main {
-
   > div {
     width: 20vw;
     height: 40vh;
