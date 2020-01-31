@@ -1,13 +1,11 @@
 import "./main.scss";
 
-var headerState = {
-  elastic: false
-};
-
 const headerEl = document.querySelector("header");
 const speechBubbleEl = document.querySelector(".speech-bubble");
 const speechBubbleTextEl = document.querySelector(".speech-bubble_text");
 const speechBubbleButtonsEl = document.querySelector(".speech-bubble_buttons");
+
+const emergencyEl = document.querySelector(".emergency");
 
 let speechBubbleNextAction = null;
 
@@ -46,7 +44,9 @@ function deliverLine(node) {
 }
 
 function cb_handleElasticHeader() {
-  headerEl.style = `height: ${window.scrollY}px; transform: translateY(${window.scrollY}px); background-color: hsl(${random(0, 360)}, 70%, 40%)`;
+  headerEl.style = `height: ${window.scrollY}px; transform: translateY(${
+    window.scrollY
+  }px); background-color: hsl(${random(0, 360)}, 70%, 40%)`;
 
   if (headerEl.offsetHeight > window.innerHeight * 0.7) {
     deliverLine(text.invisible);
@@ -62,14 +62,22 @@ function handleElasticHeader() {
 }
 
 function triggerHeaderStuck() {
-  headerEl.classList.remove('invisible');
-  headerEl.classList.add('stuck');
+  headerEl.classList.remove("invisible");
+  headerEl.classList.add("stuck");
   headerEl.onclick = () => {
     deliverLine(text.stuck);
     headerEl.onclick = undefined;
     // setTimeout(() => delete, 0);
-  }
+  };
 }
+
+function unstuck() {
+  headerEl.classList.remove("stuck");
+  emergencyEl.classList.remove("show");
+  deliverLine(text.unstack);
+}
+
+document.querySelector(".emergency button").addEventListener("click", unstuck);
 
 // TEXT
 var text = {
@@ -89,14 +97,14 @@ var text = {
       "Ooh ooh, ok, I've been sitting here all day helping people get around, and this is the awenser that I get.",
     cb: () => {
       deliverLine(text.anger);
-      headerEl.classList.add('shake');
+      headerEl.classList.add("shake");
     }
   },
   anger: {
     t: "HOW DARE YOU!!!",
     cb: () => {
       deliverLine(text.cool);
-      headerEl.classList.remove('shake');
+      headerEl.classList.remove("shake");
       headerEl.classList.remove("angry");
     }
   },
@@ -160,16 +168,36 @@ var text = {
       })
   },
   stuck: {
-    t: 'I\'m stuck.',
-    cb: () => deliverLine({
-      t: 'God, this is embarrassing...',
-      cb: () => deliverLine({
-        t: 'Will you press the EMERGENCY button?',
-        cb: () => deliverLine({
-          t: 'Please?'
-        })
+    t: "I'm stuck.",
+    cb: () =>
+      deliverLine({
+        t: "God, this is embarrassing...",
+        cb: () =>
+          deliverLine({
+            t: "Will you press the EMERGENCY button?",
+            cb: () => {
+              emergencyEl.classList.add("show");
+              deliverLine({
+                t: "Please?"
+              });
+            }
+          })
       })
-    })
+  },
+  unstack: {
+    t: "oh...",
+    cb: () =>
+      deliverLine({
+        t: "thanks, for helping me",
+        cb: () =>
+          deliverLine({
+            t: "and, yeah, i know",
+            cb: () =>
+              deliverLine({
+                t: "I've been a rude <header>."
+              })
+          })
+      })
   }
 };
 

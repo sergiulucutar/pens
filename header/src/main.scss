@@ -11,7 +11,7 @@
 body {
   margin: 0;
 
-  background-color: #F5F7DC;
+  background-color: #f5f7dc;
   font-family: "Roboto", sans-serif;
   overflow-x: hidden;
 }
@@ -109,16 +109,16 @@ header {
   border-radius: 10px;
 
   font-size: 1.4rem;
-  
-  background-color: #FFFF82;
-  
+
+  background-color: #ffff82;
+
   cursor: pointer;
   transform: translate3d(0, 120%, 0);
   visibility: hidden;
   white-space: nowrap;
 
   &:before {
-    content: '';
+    content: "";
 
     position: absolute;
     bottom: 95%;
@@ -128,7 +128,7 @@ header {
     width: 20px;
     height: 20px;
 
-    background-color: #FFFF82;
+    background-color: #ffff82;
     clip-path: polygon(0 100%, 50% 0, 100% 100%, 0 100%);
 
     transform: translateX(70%);
@@ -147,8 +147,8 @@ header {
 
       color: white;
       font-size: 1.4rem;
-      
-      background-color: #E65F5C;
+
+      background-color: #e65f5c;
     }
 
     &.show {
@@ -166,7 +166,7 @@ header {
 .page {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(40vmin, 1fr));
-  grid-row-gap: 10Vmin;
+  grid-row-gap: 10vmin;
   justify-items: center;
 
   width: 80vw;
@@ -181,7 +181,7 @@ header {
 
     border-radius: 20px;
 
-    background-color: #B5D99C;
+    background-color: #b5d99c;
   }
 }
 
@@ -197,24 +197,30 @@ header {
   padding: 20px;
 
   background-color: black;
+  transform: translateX(100%);
+
+  transition: transform 1s ease-in-out;
 
   button {
-    background-color: #E65F5C;
+    background-color: #e65f5c;
     width: 100px;
     height: 100px;
 
     border: none;
     border-radius: 50%;
-    border-bottom: 10px solid #A84643;
+    border-bottom: 10px solid #a84643;
 
     outline: none;
 
     &:active {
       border: none;
-      
-      transform: translateY(5px);
 
+      transform: translateY(5px);
     }
+  }
+
+  &.show {
+    transform: translateX(0);
   }
 
   &_text {
@@ -228,7 +234,6 @@ header {
     font-size: 3rem;
   }
 }
-
 
 @mixin animation-mixin($name, $intencity) {
   @keyframes #{$name} {
