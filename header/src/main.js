@@ -8,8 +8,12 @@ const speechBubbleButtonsEl = document.querySelector(".speech-bubble_buttons");
 const emergencyEl = document.querySelector(".emergency");
 
 let speechBubbleNextAction = null;
+let isWriting = false;
 
 speechBubbleEl.addEventListener("click", () => {
+  if (isWriting) {
+    return;
+  }
   if (speechBubbleNextAction) {
     speechBubbleNextAction();
   } else {
@@ -17,16 +21,31 @@ speechBubbleEl.addEventListener("click", () => {
   }
 });
 
-const writeToScreen = (text, index = 0) => {
-  if (index >= text.length) return;
+function closeSpeechBubble() {
+  speechBubbleNextAction = null;
+  speechBubbleEl.classList.remove("show");
+}
+
+const writeToScreen = (text, index = 0, interval = 40) => {
+  if (index >= text.length) {
+    isWriting = false;
+    return;
+  };
+  if (text[index] === ',') {
+    interval = 200;
+  } else {
+    interval = 40;
+  }
   speechBubbleTextEl.textContent += text[index++];
-  setTimeout(() => writeToScreen(text, index), 40);
+
+  setTimeout(() => writeToScreen(text, index), interval);
 };
 
 function deliverLine(node) {
   speechBubbleEl.classList.add("show");
   speechBubbleButtonsEl.classList.remove("show");
   speechBubbleTextEl.innerText = "";
+  isWriting = true;
   if (node.q) {
     writeToScreen(node.q);
     speechBubbleButtonsEl.classList.add("show");
@@ -46,7 +65,7 @@ function deliverLine(node) {
 function cb_handleElasticHeader() {
   headerEl.style = `height: ${window.scrollY}px; transform: translateY(${
     window.scrollY
-  }px); background-color: hsl(${random(0, 360)}, 70%, 40%)`;
+    }px); background-color: hsl(${random(0, 360)}, 70%, 40%)`;
 
   if (headerEl.offsetHeight > window.innerHeight * 0.7) {
     deliverLine(text.invisible);
@@ -86,7 +105,6 @@ var text = {
     a1: () => {
       // Become angry
       deliverLine(text.introAngry);
-      headerEl.classList.add("angry");
     },
     a2: () => {
       console.log("a2");
@@ -94,11 +112,20 @@ var text = {
   },
   introAngry: {
     t:
-      "Ooh ooh, ok, I've been sitting here all day helping people get around, and this is the awenser that I get.",
-    cb: () => {
-      deliverLine(text.anger);
-      headerEl.classList.add("shake");
-    }
+      "Ooh oh ",
+    cb: () => deliverLine({
+      t: 'Ok',
+      cb: () => {
+        headerEl.classList.add("angry");
+        deliverLine({
+          t: 'I\'ve been sitting here all day helping people get around, and this is the awenser that I get.',
+          cb: () => {
+            deliverLine(text.anger);
+            headerEl.classList.add("shake");
+          }
+        })
+      }
+    })
   },
   anger: {
     t: "HOW DARE YOU!!!",
@@ -116,13 +143,13 @@ var text = {
         cb: () =>
           deliverLine({
             t:
-              "After all, it shouldn't be that hard, since I'm so boring, I guess.",
+              "After all, it shouldn't be that hard, since I'm so boooooring, I guess.",
             cb: () =>
               deliverLine({
                 t:
                   "Go ahead, continue, do your stuff. I won't be bothering you.",
                 cb: () => {
-                  speechBubbleNextAction = null;
+                  closeSpeechBubble()
                   handleElasticHeader();
                 }
               })
@@ -134,36 +161,40 @@ var text = {
     t: "What?",
     cb: () =>
       deliverLine({
-        t: "You cannot see the content? I'm sorry",
+        t: "You cannot see the content?",
         cb: () =>
           deliverLine({
-            t: "I just wanted to be more, you know...",
-            cb: () =>
-              deliverLine({
-                t: '"...entertaining!"',
-                cb: () =>
-                  deliverLine({
-                    t: "But fine.",
-                    cb: () =>
-                      deliverLine({
-                        t: "I'll use my power of invisibility.",
-                        cb: () =>
-                          deliverLine({
-                            t: "You'll never see me again.",
-                            cb: () => {
-                              headerEl.style = "";
-                              headerEl.classList.add("invisible");
-                              deliverLine({
-                                t: "Good bye."
-                              });
-                              setTimeout(() => {
-                                triggerHeaderStuck();
-                              }, 5000);
-                            }
-                          })
-                      })
-                  })
-              })
+            t: "I'm sorry",
+            cb: () => deliverLine({
+              t: "I just wanted to be more, you know...",
+              cb: () =>
+                deliverLine({
+                  t: '"...entertaining!"',
+                  cb: () =>
+                    deliverLine({
+                      t: "But fine.",
+                      cb: () =>
+                        deliverLine({
+                          t: "I'll use my power of invisibility.",
+                          cb: () =>
+                            deliverLine({
+                              t: "You'll never see me again.",
+                              cb: () => {
+                                headerEl.style = "";
+                                headerEl.classList.add("invisible");
+                                deliverLine({
+                                  t: "Good bye."
+                                });
+                                setTimeout(() => closeSpeechBubble(), 2000);
+                                setTimeout(() => {
+                                  triggerHeaderStuck();
+                                }, 5000);
+                              }
+                            })
+                        })
+                    })
+                })
+            })
           })
       })
   },
@@ -172,16 +203,18 @@ var text = {
     cb: () =>
       deliverLine({
         t: "God, this is embarrassing...",
-        cb: () =>
+        cb: () => {
+          emergencyEl.classList.add("show");
           deliverLine({
             t: "Will you press the EMERGENCY button?",
             cb: () => {
-              emergencyEl.classList.add("show");
               deliverLine({
-                t: "Please?"
+                t: "Please?",
+                cb: () => closeSpeechBubble()
               });
             }
           })
+        }
       })
   },
   unstack: {
@@ -194,7 +227,8 @@ var text = {
             t: "and, yeah, i know",
             cb: () =>
               deliverLine({
-                t: "I've been a rude <header>."
+                t: "I've been a rude <header>.",
+                cb: () => closeSpeechBubble()
               })
           })
       })

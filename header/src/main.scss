@@ -91,6 +91,7 @@ header {
   }
 
   &.stuck {
+    cursor: pointer;
     transform: translateY(-70%);
   }
 }
