@@ -1,0 +1,19 @@
+:root {
+  font-size: 14px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+
+  background-color: #f5f7dc;
+  overflow-x: hidden;
+}
+
+canvas {
+  width: 100vw;
+  height: 100vh;
+}
