@@ -1,12 +1,10 @@
-// @import url('https://fonts.googleapis.com/css?family=Share+Tech+Mono&display=swap');
-
 @font-face {
   font-family: "Share Tech Mono";
-  src: url("https://fonts.googleapis.com/css?family=Share+Tech+Mono&display=swap");
+  src: url("https://fonts.googleapis.com/css?family=Share+Tech+Mono|Playfair+Display:700&display=swap");
 }
 
 :root {
-  font-size: 14px;
+  font-size: 0.74vmax;
 }
 
 * {
@@ -18,7 +16,17 @@ body {
 
   font-family: "Share Tech Mono", monospace;
 
-  > div {
+  .bubble {
+    position: absolute;
+    clip-path: circle(50%);
+
+    canvas {
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+  > section {
     position: relative;
 
     width: 100%;
@@ -49,18 +57,168 @@ body {
           mix-blend-mode: overlay;
         }
       }
+
+      .bubble:nth-of-type(1) {
+        top: 0;
+        left: 50%;
+
+        width: 40vw;
+        height: 40vw;
+
+        background-color: white;
+        background-position: 90% 40%;
+        filter: contrast(3);
+
+        transform: translate(-50%, -80%);
+      }
+
+      .bubble:nth-of-type(2) {
+        position: absolute;
+        top: 15%;
+        left: 0;
+
+        width: 40vmin;
+        height: 40vmin;
+
+        background-color: yellow;
+        // mix-blend-mode: overlay;
+      }
+    }
+
+    &:nth-of-type(2) {
+      position: relative;
+
+      background-color: yellow;
+
+      .bubble:nth-of-type(1) {
+        top: -20%;
+        left: 75%;
+
+        width: 40vw;
+        height: 40vw;
+
+        background-color: #101010;
+        transform: translateX(-50%);
+      }
+
+      .bubble:nth-of-type(2) {
+        position: absolute;
+        top: -55%;
+        right: 0;
+
+        width: 40vmin;
+        height: 40vmin;
+
+        background-color: yellow;
+      }
+
+      .bubble:nth-of-type(3) {
+        position: absolute;
+        top: -75%;
+        right: 15%;
+
+        width: 20vmin;
+        height: 20vmin;
+
+        background-color: yellow;
+      }
+
+      .bubble:nth-of-type(4) {
+        top: 20%;
+        right: 45%;
+
+        width: 40vmin;
+        height: 40vmin;
+
+        background-image: url("https://images.unsplash.com/photo-1530177150700-84cd9a3b059b?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=634&q=80");
+        background-position: 20% 50%;
+        filter: contrast(3);
+      }
+
+      .bubble:nth-of-type(5) {
+        top: 60%;
+        right: 40%;
+
+        width: 20vmin;
+        height: 20vmin;
+
+        background-image: url("https://images.unsplash.com/photo-1530177150700-84cd9a3b059b?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=634&q=80");
+        background-position: 90% 40%;
+        filter: contrast(3);
+      }
     }
 
     &:nth-of-type(3) {
-      background-color: #101010;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-gap: 13%;
 
-      canvas {
+      padding: 0 10%;
+
+      overflow: hidden;
+
+      div {
+        height: 90%;
+
+        &:nth-of-type(1),
+        &:nth-of-type(2) {
+          background-size: cover;
+          filter: grayscale(1) contrast(2);
+        }
+
+        &:first-child {
+          background-image: url("https://images.unsplash.com/photo-1541703044-7e33575f7c4c?ixlib=rb-1.2.1&auto=format&fit=crop&w=700&q=80");
+        }
+
+        &:nth-of-type(2) {
+          background-image: url("https://images.unsplash.com/photo-1491147334573-44cbb4602074?ixlib=rb-1.2.1&auto=format&fit=crop&w=2134&q=80");
+
+          align-self: flex-end;
+        }
+      }
+
+      .sc3_overlay {
         position: absolute;
-        top: 0;
+        top: -25%;
         left: 0;
 
-        width: 100%;
-        height: 100%;
+        height: 200%;
+
+        mix-blend-mode: multiply;
+
+        line-height: 0.7;
+
+        span {
+          color: yellow;
+          font-size: 35rem;
+        }
+      }
+    }
+
+    &:nth-of-type(4) {
+      background-color: #101010;
+
+      .bubble:nth-of-type(2) {
+        top: 10%;
+        left: 10%;
+
+        width: 60vmin;
+        height: 60vmin;
+
+        background-image: url("https://images.unsplash.com/photo-1530177150700-84cd9a3b059b?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=634&q=80");
+        background-position: 90% 40%;
+        filter: contrast(3);
+      }
+
+      .bubble:nth-of-type(1) {
+        bottom: 10%;
+        left: 25%;
+
+        width: 60vmin;
+        height: 60vmin;
+
+        background-position: 90% 40%;
+        filter: contrast(3);
       }
     }
   }

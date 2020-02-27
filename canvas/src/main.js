@@ -20,7 +20,7 @@ function setup() {
 var planeMesh, boxMesh, planeTexture;
 var planeGeomSize = [400, 200];
 function createScene() {
-  const planeGeom = new THREE.PlaneGeometry(400, 200, 20);
+  const planeGeom = new THREE.PlaneGeometry(planeGeomSize[0], planeGeomSize[1], 20, 20);
   planeTexture = new THREE.CanvasTexture(canvas);
   planeTexture.minFilter = THREE.LinearFilter;
   const planeMat = new THREE.MeshBasicMaterial({
@@ -30,7 +30,7 @@ function createScene() {
   planeMesh = new THREE.Mesh(planeGeom, planeMat);
 
   planeMesh.position.x = 0;
-  planeMesh.position.y = -10;
+  planeMesh.position.y = -15;
   planeMesh.position.z = 0;
 
   planeMesh.rotation.x = Math.PI / 2;
@@ -38,19 +38,26 @@ function createScene() {
   scene.add(planeMesh);
 
 
-  const boxGeom = new THREE.BoxGeometry(20, 20, 20);
-  const boxMat = new THREE.MeshBasicMaterial({
-    color: 'black'
+  const boxGeom = new THREE.BoxGeometry(30, 30, 30);
+  const boxMat = new THREE.MeshPhongMaterial({
+    shininess: 150
   });
   boxMesh = new THREE.Mesh(boxGeom, boxMat);
   scene.add(boxMesh);
+
+  //light
+  scene.add(new THREE.AmbientLight('white', 1))
 }
 
 // Animations
 var a_state = {
   radius: 0,
   height: 0,
-  rotation: 0
+  rotation: 0,
+  c_bg: '',
+  c_circle: 120,
+  c_oldHue: 0,
+  c_newHue: 0 
 };
 
 // Canvas drawing
@@ -62,12 +69,14 @@ var ctx = canvas.getContext('2d');
 function drawOnCanvas() {
   ctx.clearRect(0, 0, planeGeomSize[0], planeGeomSize[1]);
 
+  ctx.fillStyle = toHSLString(a_state.c_oldHue);
+  ctx.beginPath();
+  ctx.fillRect(0, 0, planeGeomSize[0], planeGeomSize[1]);
+
   ctx.beginPath();
   ctx.arc(planeGeomSize[0] / 2, planeGeomSize[1] / 2, a_state.radius, 0, 2 * Math.PI);
-  ctx.fillStyle = 'blue';
+  ctx.fillStyle = toHSLString(a_state.c_newHue);
   ctx.fill();
-  ctx.strokeStyle = 'white';
-  ctx.stroke();
 }
 
 // Loop functions
@@ -79,6 +88,7 @@ function draw() {
 function update() {
   boxMesh.position.y = a_state.height;
   boxMesh.rotation.y = a_state.rotation * 2 * Math.PI;
+  boxMesh.material.color.setHSL((a_state.c_newHue + (a_state.c_oldHue - a_state.c_newHue) * (1 - a_state.rotation)) / 360, 1, 0.5);
 }
 
 function loop() {
@@ -93,10 +103,24 @@ window.onload = function () {
   createScene();
   loop();
 
-  const timeline = new TimelineLite({ repeat: -1, repeatDelay: 1 });
+  const timeline = new TimelineLite({ repeat: -1, repeatDelay: 1});
   timeline
-    .to(a_state, .5, { height: 80, ease: Power4.easeOut })
+    .set(a_state, {onComplete: () => {
+      a_state.c_oldHue = a_state.c_newHue;
+      a_state.c_newHue = getRandomColor();
+    }})
+    .to(a_state, .5, { height: 80, ease: Power4.easeOut }, 0)
+    .to(a_state, .5, { rotation: 1 }, 0)
     .to(a_state, .5, { rotation: 1 }, 0)
     .to(a_state, .5, { height: 0, ease: Power4.easeIn })
-    .to(a_state, 2, { radius: 200, onUpdate: () => planeTexture.needsUpdate = true });
+    .to(a_state, 1, { radius: 300, onUpdate: () => planeTexture.needsUpdate = true}, "-=0.05");
+}
+
+
+function getRandomColor() {
+  return Math.floor(Math.random() * 360);
+}
+
+function toHSLString(color) {
+  return `hsl(${color}, 100%, 50%)`
 }
