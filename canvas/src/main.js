@@ -2,6 +2,7 @@ import './main.scss';
 import * as THREE from 'three';
 import { TimelineLite } from 'gsap';
 import { Power4 } from 'gsap/gsap-core';
+import { wrap } from 'gsap/src/all';
 
 var camera, scene, renderer;
 function setup() {
@@ -25,15 +26,18 @@ function setup() {
   document.querySelector('#app').appendChild(renderer.domElement);
 }
 
-var planeMesh, boxMesh, planeTexture;
+var planeMesh, boxMesh, planeTexture, object, wrapper;
 var planeGeomSize = [400, 200];
 function createScene() {
+  wrapper = new THREE.Object3D();
+
   const planeGeom = new THREE.PlaneBufferGeometry(planeGeomSize[0], planeGeomSize[1], 20, 20);
   planeTexture = new THREE.CanvasTexture(canvas);
   planeTexture.minFilter = THREE.LinearFilter;
-  const planeMat = new THREE.MeshPhongMaterial({
+  const planeMat = new THREE.MeshStandardMaterial({
     map: planeTexture,
-    side: THREE.BackSide
+    side: THREE.BackSide,
+    roughness: 0.4
   });
   planeMesh = new THREE.Mesh(planeGeom, planeMat);
 
@@ -44,7 +48,8 @@ function createScene() {
 
   planeMesh.receiveShadow = true;
 
-  scene.add(planeMesh);
+  // scene.add(planeMesh);
+  wrapper.add(planeMesh);
 
   const boxGeom = new THREE.BoxBufferGeometry(30, 30, 30);
   const boxMat = new THREE.MeshStandardMaterial({
@@ -52,7 +57,9 @@ function createScene() {
   });
   boxMesh = new THREE.Mesh(boxGeom, boxMat);
   boxMesh.castShadow = true;
-  scene.add(boxMesh);
+  // scene.add(boxMesh);
+  wrapper.add(boxMesh);
+  scene.add(wrapper);
 
   //light
   scene.add(new THREE.AmbientLight('white', 0.2));
@@ -70,7 +77,6 @@ function createScene() {
   directionalLight.shadowCameraTop = 80;
   directionalLight.shadowCameraBottom = -80;
 
-
   scene.add(directionalLight);
 }
 
@@ -79,10 +85,10 @@ var a_state = {
   radius: 0,
   height: 0,
   rotation: 0,
-  c_bg: '',
   c_circle: 120,
   c_oldHue: 0,
-  c_newHue: 0
+  c_newHue: 0,
+  w_scale: 1
 };
 
 // Canvas drawing
@@ -115,6 +121,7 @@ function update() {
   boxMesh.rotation.y = a_state.rotation * 2 * Math.PI;
   boxMesh.rotation.x = a_state.rotation * 2 * Math.PI;
   boxMesh.material.color.setHSL((a_state.c_newHue + (a_state.c_oldHue - a_state.c_newHue) * (1 - a_state.rotation)) / 360, 1, 0.5);
+  wrapper.position.y = -(1 - a_state.w_scale) * 20
 }
 
 function loop() {
@@ -137,11 +144,13 @@ window.onload = function () {
         a_state.c_newHue = getRandomColor();
       }
     })
-    .to(a_state, .5, { height: 80, ease: Power4.easeOut }, 0)
+    .to(a_state, .5, { height: 100, ease: Power4.easeOut }, 0)
     .to(a_state, .5, { rotation: 1 }, 0)
     .to(a_state, .5, { rotation: 1 }, 0)
     .to(a_state, .5, { height: 0, ease: Power4.easeIn })
-    .to(a_state, 1, { radius: 300, onUpdate: () => planeTexture.needsUpdate = true }, "-=0.05");
+    .set(a_state, { w_scale: 0 })
+    .to(a_state, .5, { w_scale: 1 })
+    .to(a_state, 1, { radius: 300, onUpdate: () => planeTexture.needsUpdate = true }, "-=0.51");
 }
 
 
