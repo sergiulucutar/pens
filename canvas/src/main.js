@@ -2,11 +2,11 @@ import './main.scss';
 import * as THREE from 'three';
 import { TimelineLite } from 'gsap';
 import { Power4 } from 'gsap/gsap-core';
-import { wrap } from 'gsap/src/all';
+import { wrap, TweenLite } from 'gsap/src/all';
 
 var camera, scene, renderer;
 function setup() {
-  camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
   scene = new THREE.Scene();
 
   camera.position.z = 0;
@@ -91,6 +91,10 @@ var a_state = {
   w_scale: 1
 };
 
+var box_state = {
+  position: [0, 0]
+}
+
 // Canvas drawing
 var canvas = document.createElement('canvas');
 canvas.width = planeGeomSize[0];
@@ -117,11 +121,25 @@ function draw() {
 }
 
 function update() {
+  // Jump animation
   boxMesh.position.y = a_state.height;
-  boxMesh.rotation.y = a_state.rotation * 2 * Math.PI;
-  boxMesh.rotation.x = a_state.rotation * 2 * Math.PI;
-  boxMesh.material.color.setHSL((a_state.c_newHue + (a_state.c_oldHue - a_state.c_newHue) * (1 - a_state.rotation)) / 360, 1, 0.5);
-  wrapper.position.y = -(1 - a_state.w_scale) * 20
+
+  if (mouseHolded) {
+    const targetX = normalize(box_state.position[0], -1, 1, -50, 50);
+    const targetZ = normalize(box_state.position[1], -1, 1, 20, -20);
+
+    boxMesh.position.x += (targetX - boxMesh.position.x) * 0.5;
+    boxMesh.position.z += (targetZ - boxMesh.position.z) * 0.5;
+
+    boxMesh.rotation.x += .05;
+    boxMesh.rotation.y += .05;
+    boxMesh.rotation.z += .05;
+  } else {
+    boxMesh.rotation.y = a_state.rotation * Math.PI;
+    boxMesh.rotation.x = a_state.rotation * Math.PI;
+    boxMesh.material.color.setHSL((a_state.c_newHue + (a_state.c_oldHue - a_state.c_newHue) * (1 - a_state.rotation)) / 360, 1, 0.5);
+    wrapper.position.y = -(1 - a_state.w_scale) * 20;
+  }
 }
 
 function loop() {
@@ -130,13 +148,13 @@ function loop() {
   draw();
 }
 
-
+var timeline;
 window.onload = function () {
   setup();
   createScene();
   loop();
 
-  const timeline = new TimelineLite({ repeat: -1, repeatDelay: 1 });
+  timeline = new TimelineLite({ repeat: -1, repeatDelay: 1 });
   timeline
     .set(a_state, {
       onComplete: () => {
@@ -159,5 +177,37 @@ function getRandomColor() {
 }
 
 function toHSLString(color) {
-  return `hsl(${color}, 100%, 50%)`
+  return `hsl(${color}, 75%, 50%)`;
+}
+
+var mouseHolded = false;
+document.addEventListener("mousedown", event => {
+  mouseHolded = true;
+  if (!timeline.paused()) {
+    timeline.pause();
+    TweenLite.to(a_state, .5, { height: 100 });
+  }
+
+  normalize();
+});
+
+document.addEventListener("mouseup", () => {
+  mouseHolded = false;
+  TweenLite.to(a_state, .5, { height: 0, ease: Power4.easeIn, onComplete: () => timeline.restart() });
+});
+
+document.addEventListener("mousemove", event => {
+  if (mouseHolded) {
+    box_state.position = [-1 + (event.clientX / window.innerWidth) * 2, 1 - (event.clientY / window.innerHeight) * 2];
+  }
+});
+
+function normalize(v, vmin, vmax, tmin, tmax) {
+  var nv = Math.max(Math.min(v, vmax), vmin);
+  var dv = vmax - vmin;
+  var pc = (nv - vmin) / dv;
+  var dt = tmax - tmin;
+  var tv = tmin + (pc * dt);
+  return tv;
+
 }
